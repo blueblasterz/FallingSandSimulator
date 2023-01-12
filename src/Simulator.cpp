@@ -16,7 +16,7 @@ int Simulator::mainloop() {
     
     sf::Clock clock = sf::Clock();
 
-    float fps = 120.;
+    float fps = 1200000.;
 
     sf::Time requested_fps = sf::microseconds(1000000./fps);
 
@@ -66,10 +66,12 @@ int Simulator::mainloop() {
             if(t.first->get_y() > 1) {
                 t.first->dmove(0,-1);
 
-                t.second.setPosition(t.first->get_x(), m_h-t.first->get_y());
-                // cout << t.second.getPosition().x << " " << t.second.getPosition().y << endl;  
+                // t.second.setPosition(t.first->get_x(), m_h-t.first->get_y());
                 i++;
             }
+            // cout << t.second.getPosition().x << " " << t.second.getPosition().y << endl;  
+
+                t.second.setPosition(t.first->get_x(), m_h-t.first->get_y());                
             m_window.draw(t.second);
         }
 
@@ -80,7 +82,7 @@ int Simulator::mainloop() {
         clock.restart();
         // cout << "endofframe\n";
         frame_count++;
-        if(frame_count%(int)(fps/2) == 0)
+        if(frame_count%(int)(200) == 0)
             cout << "frame " << frame_count << " " 
             << m_tiles.size() << " tiles\n";
     }
