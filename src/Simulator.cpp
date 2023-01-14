@@ -6,11 +6,19 @@ Simulator::Simulator(int w, int h, int tile_size):
 m_win_w(w), m_win_h(h), m_tile_size(tile_size) {
     m_w = m_win_w / tile_size;
     m_h = m_win_h / tile_size;
+
+    m_cells = new std::vector<std::vector<Tile *>>();
+    m_cells->resize(m_w);
+    for(int i = 0; i < m_w; i++) {
+        (*m_cells)[i].resize(m_h);
+    }
+
+
 }
 
 int Simulator::mainloop() {
 
-    sf::RenderWindow m_window(
+    m_window = new sf::RenderWindow(
         sf::VideoMode(m_win_w, m_win_h),
         "Falling Sand Simulator");
 
@@ -22,14 +30,14 @@ int Simulator::mainloop() {
 
     bool mouse_pressed = false;
     int frame_count=0;
-    while (m_window.isOpen())
+    while (m_window->isOpen())
     {
         sf::Event event;
-        while (m_window.pollEvent(event))
+        while (m_window->pollEvent(event))
         {
             switch(event.type) {
                 case sf::Event::Closed:
-                    m_window.close();
+                    m_window->close();
                     break;
                 case sf::Event::MouseButtonPressed:
                     if(event.mouseButton.button == sf::Mouse::Left)
@@ -41,26 +49,20 @@ int Simulator::mainloop() {
                     break;
             }
         }
-        m_window.clear();
+        m_window->clear();
 
         if(mouse_pressed) {
-            int x = sf::Mouse::getPosition(m_window).x;
-            int y = sf::Mouse::getPosition(m_window).y;
-            add_tile(new Tile(x/m_tile_size, m_h - y/m_tile_size));
+            int x = sf::Mouse::getPosition(*m_window).x;
+            int y = sf::Mouse::getPosition(*m_window).y;
+            if(0 < x && x < m_w && 0 < y && y < m_h)
+                add_tile(new TileEmpty(x/m_tile_size, 
+                                       m_h - y/m_tile_size,
+                                       m_cells));
         }
 
-        int i=0;
-        for(auto t : m_tiles) {
-            if(t.first->get_y() > 1) {
-                t.first->dmove(0,-1);
+        update_tiles();
 
-                t.second->setPosition(t.first->get_x(), m_h-t.first->get_y());
-                i++;
-            }         
-            m_window.draw(*t.second);
-        }
-
-        m_window.display();
+        m_window->display();
 
         sf::Time dt = clock.getElapsedTime();
         sf::sleep(requested_fps-dt);
@@ -71,6 +73,7 @@ int Simulator::mainloop() {
             << m_tiles.size() << " tiles\n";
     }
 
+    delete m_window;
     return 0;
 }
 
@@ -87,18 +90,31 @@ void Simulator::remove_tile(int i) {
     m_tiles.erase(m_tiles.begin()+i);
 }
 
-int Simulator::update_display() {
-    // m_window.clear();
-    // // int t = update_tiles();
-    // m_window.display();
-    return 0;
-}
+// int Simulator::update_display() {
+//     // m_window.clear();
+//     // // int t = update_tiles();
+//     // m_window.display();
+//     return 0;
+// }
 
 int Simulator::update_tiles() {
-    // m_window.draw(shape);
+    for(auto t : m_tiles) {
+        if(t.first->get_y() > 1) {
+            t.first->dmove(0,-1);
+
+            t.second->setPosition(t.first->get_x(), m_h-t.first->get_y());
+        }         
+        m_window->draw(*t.second);
+    }
+
     return 0;
 }
 
+
+
+std::vector<std::vector<Tile *>> * Simulator::get_cells() {
+    return m_cells;
+}
 
 
 

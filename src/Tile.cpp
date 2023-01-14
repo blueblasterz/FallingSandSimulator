@@ -1,7 +1,14 @@
 #include "Tile.hpp"
+#include <iostream>
 
-Tile::Tile(int x, int y) : m_x(x), m_y(y) {
+using std::cout, std::endl;
 
+Tile::Tile(int x, int y,  std::vector<std::vector<Tile *>> * cells) 
+: m_x(x), m_y(y), m_cells(cells) {
+    if((*m_cells)[m_x][m_y] != nullptr) {
+        delete (*m_cells)[m_x][m_y];
+    }
+    (*m_cells)[x][y] = this;
 }
 
 void Tile::move(int new_x, int new_y) {
@@ -15,10 +22,14 @@ void Tile::dmove(int dx, int dy) {
 }
 
 std::array<int,2> Tile::get_pos() {
-    std::array<int,2> res;
-    res[0] = m_x;
-    res[1] = m_y;
-    return res;
+    // std::array<int,2> res;
+    // res[0] = m_x;
+    // res[1] = m_y;
+    // // cout << "in get_pos :" << endl
+    // // << m_x << " " << m_y << endl
+    // // << res[0] << " " << res[1] << endl;
+    // return res;
+    return {m_x,m_y};
 }
 
 int Tile::get_x() {
