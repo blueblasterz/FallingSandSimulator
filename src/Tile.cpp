@@ -5,10 +5,11 @@ using std::cout, std::endl;
 
 Tile::Tile(int x, int y,  std::vector<std::vector<Tile *>> * cells) 
 : m_x(x), m_y(y), m_cells(cells) {
-    if((*m_cells)[m_x][m_y] != nullptr) {
-        delete (*m_cells)[m_x][m_y];
+
+    if(m_cells->at(m_x).at(m_y) != nullptr) {
+        delete m_cells->at(m_x).at(m_y);
     }
-    (*m_cells)[x][y] = this;
+    m_cells->at(m_x).at(m_y) = this;
 }
 
 void Tile::move(int new_x, int new_y) {

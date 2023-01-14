@@ -4,7 +4,7 @@ OBJDIR=./obj
 INCDIR=./include
 
 EXEC=main
-ARGS=-g
+ARGS=-g -std=c++20
 LDLIBS=-lsfml-graphics -lsfml-window -lsfml-system
 CC=g++
 
@@ -14,11 +14,11 @@ SRC=$(wildcard $(SRCDIR)/*.cpp)
 INC:=$(wildcard $(INCDIR)/*.hpp)
 OBJ:=$(SRC:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
 
-$(BINDIR)/$(EXEC): $(OBJ) $(INC)
+$(BINDIR)/$(EXEC): $(OBJ) $(INC) Makefile
 	@mkdir -p $(BINDIR)
 	$(CC) -o $@ $(OBJ) $(ARGS) $(LDLIBS)
 
-$(OBJ): $(OBJDIR)/%.o: $(SRCDIR)/%.cpp $(INC)
+$(OBJ): $(OBJDIR)/%.o: $(SRCDIR)/%.cpp $(INC) Makefile
 	@mkdir -p $(OBJDIR)
 	$(CC) -o $@ -c $< -I$(INCDIR) $(ARGS)
 
