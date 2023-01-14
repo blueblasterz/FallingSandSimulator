@@ -15,8 +15,12 @@ void Tile::dmove(int dx, int dy) {
 }
 
 std::array<int,2> Tile::get_pos() {
-    return {m_x,m_y};
+    std::array<int,2> res;
+    res[0] = m_x;
+    res[1] = m_y;
+    return res;
 }
+
 int Tile::get_x() {
     return m_x;
 }
