@@ -7,7 +7,8 @@
 class TileEmpty : public Tile {
 public:
 
-    TileEmpty(int x, int y, std::vector<std::vector<Tile *>> * cells);
+    TileEmpty(int x, int y, int w, int h, TYPE_CELLMATRIX * cells, 
+              TYPE_CELLMATRIX * cells_future);
 
     int update();
 

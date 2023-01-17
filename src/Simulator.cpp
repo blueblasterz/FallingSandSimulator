@@ -7,18 +7,20 @@ m_win_w(w), m_win_h(h), m_tile_size(tile_size) {
     m_w = m_win_w / tile_size;
     m_h = m_win_h / tile_size;
 
-    m_cells = new std::vector<std::vector<Tile *>>();
+    m_cells = new TYPE_CELLMATRIX();
     m_cells->resize(m_w);
+    m_cells_future = new TYPE_CELLMATRIX();
+    m_cells_future->resize(m_w);
     for(int i = 0; i < m_w; i++) {
         m_cells->at(i).resize(m_h);
+        m_cells_future->at(i).resize(m_h);
         for(int j = 0; j < m_h; j++) {
             m_cells->at(i).at(j) = nullptr;
+            m_cells_future->at(i).at(j) = nullptr;
         }
     }
 
-    if( m_cells->at(2).at(2) != nullptr ) {
-        exit(3);
-    }
+    m_nb_tiles = 0;
 
 
 }
@@ -33,15 +35,16 @@ int Simulator::mainloop() {
     sf::Clock clock_boucle = sf::Clock();
     sf::Clock clock_fps = sf::Clock();
 
-    const float fps = 600000000000000000.;
+    const float fps = 500.;
 
     sf::Time requested_fps = sf::microseconds(1000000./fps);
 
     bool mouse_pressed = false;
     int frame_count=0;
-    int compteur_tile = 0;
 
     char title[128] = {0};
+
+    bool last_frame_added = false;
 
     while (m_window->isOpen())
     {
@@ -53,29 +56,47 @@ int Simulator::mainloop() {
                     m_window->close();
                     break;
                 case sf::Event::MouseButtonPressed:
-                    if(event.mouseButton.button == sf::Mouse::Left)
-                        mouse_pressed = true;
+                    if(event.mouseButton.button == sf::Mouse::Left) {
+                        
+                        // mouse_pressed = true;
+
+                        int x = sf::Mouse::getPosition(*m_window).x;
+                        int y = sf::Mouse::getPosition(*m_window).y;
+                        int c = 0;
+                        for(int dx=0;dx < 40 && x+dx < m_w; dx++) {
+                            for(int dy=0; dy<20 && y+2*dy < m_h; dy++) {
+                                c++;
+                                add_tile<TileSand>(x+dx,m_h-(y+2*dy));
+                            }
+                        }
+                    }
+
                     break;
                 case sf::Event::MouseButtonReleased:
-                    if(event.mouseButton.button == sf::Mouse::Left)
-                        mouse_pressed = false;
+                    if(event.mouseButton.button == sf::Mouse::Left) {
+                        // mouse_pressed = false;
+                    }
                     break;
             }
         }
         m_window->clear();
 
         if(mouse_pressed) {
-            int x = sf::Mouse::getPosition(*m_window).x;
-            int y = sf::Mouse::getPosition(*m_window).y;
-            if(0 < x && x < m_win_w && 0 < y && y < m_win_h) {
-                // cout << compteur_tile << " : " << x << " " << y << endl;
-                compteur_tile++;
-                if ( m_cells->at(x/m_tile_size).at(m_h - y/m_tile_size) 
-                    == nullptr ) {
-                    Tile * t = new TileEmpty(x/m_tile_size, 
-                                       m_h - y/m_tile_size,
-                                       m_cells);
-                    add_tile(t);
+            if(last_frame_added = !last_frame_added) {
+
+                int x = sf::Mouse::getPosition(*m_window).x;
+                int y = sf::Mouse::getPosition(*m_window).y;
+                if(0 < x && x < m_win_w && 0 < y && y < m_win_h) {
+                    // cout << m_nb_tiles << " : " << x << " " << y << endl;
+                    m_nb_tiles++;
+                    // if ( m_cells->at(x/m_tile_size).at(m_h - y/m_tile_size)
+                    //     == nullptr ) {
+                        // Tile * t = new TileSand(x/m_tile_size, 
+                        //                 m_h - y/m_tile_size,
+                        //                 m_w, m_h,
+                        //                 m_cells, m_cells_future);
+                        add_tile<TileSand>(x/m_tile_size, m_h - y/m_tile_size);
+                    // }
                 }
             }
         }
@@ -97,12 +118,22 @@ int Simulator::mainloop() {
             clock_fps.restart();
         }
 
-
+        // cout << "all tiles :" << endl;
+        // Tile * t;
+        // for(int x = 0; x < m_w; x++) {
+        //     for(int y = 0; y < m_h; y++) {
+        //         t = m_cells->at(x).at(y);
+        //         if(t != nullptr) {
+        //             cout << " at " << x << " " << y << endl;
+        //         }
+        //     }
+        // }
+        // cout << "----" << endl;
 
         frame_count++;
         // if(frame_count%(int)(200) == 0)
         //     cout << "frame " << frame_count << " " 
-        //     << m_tiles.size() << " tiles\n";
+        //     << m_nb_tiles << " tiles\n";
         clock_logique.restart();
         clock_boucle.restart();
     }
@@ -111,14 +142,17 @@ int Simulator::mainloop() {
     return 0;
 }
 
-
+template<class TileType>
+void Simulator::add_tile(int x, int y) {
+    if ( m_cells->at(x).at(y) != nullptr )
+        return;
+    Tile * t = new TileType(x,y,m_w,m_h, m_cells, m_cells_future);
+    m_tiles.push_back(t);
+    t->get_rectangle()->setSize(sf::Vector2f(m_tile_size, m_tile_size));
+}
 void Simulator::add_tile(Tile * tile) {
-    sf::RectangleShape * newr = new sf::RectangleShape();
-    // sf::RectangleShape newr;
-    newr->setSize(sf::Vector2f(m_tile_size,m_tile_size));
-    newr->setFillColor(sf::Color(255,255,255));
-    newr->setPosition(tile->get_x(), m_h-tile->get_y());
-    m_tiles.push_back(std::pair(tile,newr));
+    m_tiles.push_back(tile);
+    tile->get_rectangle()->setSize(sf::Vector2f(m_tile_size, m_tile_size));
 }
 void Simulator::remove_tile(int i) {
     m_tiles.erase(m_tiles.begin()+i);
@@ -132,30 +166,76 @@ void Simulator::remove_tile(int i) {
 // }
 
 int Simulator::update_tiles() {
-    std::pair<Tile *, sf::RectangleShape *> t;
+    Tile * t;
+    
+    // printf("%p %p\n", m_cells, m_cells_future);
+    // cout << "all tiles :" << endl;
+    // for(int x = 0; x < m_w; x++) {
+    //     for(int y = 0; y < m_h; y++) {
+    //         t = m_cells->at(x).at(y);
+    //         if(t != nullptr) {
+    //             cout << " at " << x << " " << y << endl;
+    //         }
+    //     }
+    // }
+    // cout << "----" << endl;
+
     for(int i = 0; i < m_tiles.size(); i++) {
         t = m_tiles.at(i);
-        // cout << t.first->get_x() << endl;
-        if(t.first->get_x() < 0 || t.first->get_x() > m_win_w) {
-            printf("AAAAAAAAAAAAAAAH : %i: %i : %p\n",
-                   i, t.first->get_x(), t.first);
-            exit(1);
-        }
-        if(t.first->get_y() > 1) {
-            t.first->dmove(0,-1);
+        // cout << t->get_y() << endl;
+        // if(t.first->get_y() > 1) {
+        //     t.first->dmove(0,-1);
 
-            t.second->setPosition(t.first->get_x(), m_h-t.first->get_y());
-        }         
-        m_window->draw(*t.second);
+        //     t.second->setPosition(t.first->get_x(), m_h-t.first->get_y());
+        // }    
+        t->update();
+        // sf::RectangleShape r = *t->get_rectangle();
+        // cout << r.getPosition().x << " " << r.getPosition().y << endl;
+        // cout << r.getFillColor().r << " " << r.getFillColor().g << " "
+        //      << r.getFillColor().b << endl;
     }
+
+    for(int x = 0; x < m_w; x++) {
+        for(int y = 0; y < m_h; y++) {
+            Tile * t = m_cells_future->at(x).at(y);
+            m_cells->at(x).at(y) = t;
+            if(t != nullptr)
+                m_window->draw( *t->get_rectangle() );
+        }
+    }
+    
+
+    // std::pair<Tile *, sf::RectangleShape *> t;
+    // for(int x = 0; x < m_w; x++) {
+    //     for(int y = 0; y < m_h; y++) {
+    //         t = m_cells->at(x).at(y);
+    //         if(t.first != nullptr)
+    //             t.first->update(); // modifies cell_future
+    //     }
+    // }
+
+    // for(int x = 0; x < m_w; x++) {
+    //     for(int y = 0; y < m_h; y++) {
+    //         t = m_cells_future->at(x).at(y);
+    //         m_cells->at(x).at(y) = t;
+    //         if(t.first != nullptr) {
+    //             m_window->draw(*t.second);
+    //         }
+            
+    //     }
+    // }
 
     return 0;
 }
 
 
 
-std::vector<std::vector<Tile *>> * Simulator::get_cells() {
+TYPE_CELLMATRIX * Simulator::get_cells() {
     return m_cells;
+}
+
+TYPE_CELLMATRIX * Simulator::get_cells_future() {
+    return m_cells_future;
 }
 
 

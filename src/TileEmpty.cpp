@@ -2,10 +2,10 @@
 
 using std::cout, std::endl;
 
-TileEmpty::TileEmpty(int x, int y, std::vector<std::vector<Tile *>> * cells) :
-Tile(x, y, cells) {
-    // cout << m_x << " " << m_y << endl;
-    Tile * t = cells->at(m_x).at(m_y);
+TileEmpty::TileEmpty(int x, int y, int w, int h, TYPE_CELLMATRIX * cells, 
+                     TYPE_CELLMATRIX * cells_future):
+Tile(x, y, w, h, cells, cells_future) {
+
 }
 
 int TileEmpty::update() {
