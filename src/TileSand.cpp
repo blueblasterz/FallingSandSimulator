@@ -17,7 +17,8 @@ int TileSand::update() {
     }
     
     // printf("%p %p\n", m_cells, m_cells_future);
-    if( m_cells->at(m_x).at(m_y-1) == nullptr ) {
+    if( m_cells->at(m_x).at(m_y-1) == nullptr
+    &&  m_cells_future->at(m_x).at(m_y-1) == nullptr ) {
         // cout << m_x << " " << m_y <<endl;
         m_cells_future->at(m_x).at(m_y-1) = m_cells->at(m_x).at(m_y);
         m_cells_future->at(m_x).at(m_y) = nullptr;
@@ -27,7 +28,8 @@ int TileSand::update() {
     else {
         int rd = (rand()%2)*2 -1;
         if( m_x+rd >= 0 && m_x+rd < m_w 
-        &&  m_cells->at(m_x+rd).at(m_y-1) == nullptr ) {
+        &&  m_cells->at(m_x+rd).at(m_y-1) == nullptr 
+        &&  m_cells_future->at(m_x+rd).at(m_y-1) == nullptr ) {
             m_cells_future->at(m_x+rd).at(m_y-1) = m_cells->at(m_x).at(m_y);
             m_cells_future->at(m_x).at(m_y) = nullptr;
             m_y -= 1;
@@ -35,12 +37,16 @@ int TileSand::update() {
             m_rect->setPosition(m_x, m_h - m_y);
         }
         else if( m_x-rd >= 0 && m_x-rd < m_w 
-        &&  m_cells->at(m_x-rd).at(m_y-1) == nullptr ) {
+        &&  m_cells->at(m_x-rd).at(m_y-1) == nullptr
+        &&  m_cells_future->at(m_x-rd).at(m_y-1) == nullptr ) {
             m_cells_future->at(m_x-rd).at(m_y-1) = m_cells->at(m_x).at(m_y);
             m_cells_future->at(m_x).at(m_y) = nullptr;
             m_y -= 1;
             m_x -= rd;
             m_rect->setPosition(m_x, m_h - m_y);
+        }
+        else {
+            m_cells_future->at(m_x).at(m_y) == nullptr;
         }
     }
     return 0;

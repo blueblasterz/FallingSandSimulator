@@ -66,7 +66,8 @@ int Simulator::mainloop() {
                         for(int dx=0;dx < 40 && x+dx < m_w; dx++) {
                             for(int dy=0; dy<20 && y+2*dy < m_h; dy++) {
                                 c++;
-                                add_tile<TileSand>(x+dx,m_h-(y+2*dy));
+                                // add_tile<TileSand>(x+dx,m_h-(y+2*dy));
+                                add_tile<TileSand>(x+dx,m_h-(y+dy));
                             }
                         }
                     }
@@ -189,6 +190,7 @@ int Simulator::update_tiles() {
         //     t.second->setPosition(t.first->get_x(), m_h-t.first->get_y());
         // }    
         t->update();
+
         // sf::RectangleShape r = *t->get_rectangle();
         // cout << r.getPosition().x << " " << r.getPosition().y << endl;
         // cout << r.getFillColor().r << " " << r.getFillColor().g << " "
