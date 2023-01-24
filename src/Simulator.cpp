@@ -7,6 +7,9 @@ m_win_w(w), m_win_h(h), m_tile_size(tile_size) {
     m_w = m_win_w / tile_size;
     m_h = m_win_h / tile_size;
 
+    srand(time(NULL));
+    // srand(0);
+
     m_cells = new TYPE_CELLMATRIX();
     m_cells->resize(m_w);
     m_cells_future = new TYPE_CELLMATRIX();
@@ -29,18 +32,21 @@ int Simulator::mainloop() {
 
     m_window = new sf::RenderWindow(
         sf::VideoMode(m_win_w, m_win_h),
-        "Falling Sand Simulator");
+        "Falling Sand Sim");
 
     sf::Clock clock_logique = sf::Clock();
     sf::Clock clock_boucle = sf::Clock();
     sf::Clock clock_fps = sf::Clock();
 
-    const float fps = 500.;
+    const float fps = 1000.;
 
     sf::Time requested_fps = sf::microseconds(1000000./fps);
 
     bool mouse_pressed = false;
     int frame_count=0;
+
+    bool paused = !true;
+    int step = 0;
 
     char title[128] = {0};
 
@@ -55,6 +61,15 @@ int Simulator::mainloop() {
                 case sf::Event::Closed:
                     m_window->close();
                     break;
+                case sf::Event::KeyPressed:
+                    // cout << "keypress" << endl;
+                    if(event.key.code == sf::Keyboard::P) {
+                        paused = !paused;
+                    }
+                    else if(event.key.code == sf::Keyboard::S) {
+                        step++;
+                    }
+                    break;
                 case sf::Event::MouseButtonPressed:
                     if(event.mouseButton.button == sf::Mouse::Left) {
                         
@@ -66,8 +81,8 @@ int Simulator::mainloop() {
                         for(int dx=0;dx < 40 && x+dx < m_w; dx++) {
                             for(int dy=0; dy<20 && y+2*dy < m_h; dy++) {
                                 c++;
-                                // add_tile<TileSand>(x+dx,m_h-(y+2*dy));
-                                add_tile<TileSand>(x+dx,m_h-(y+dy));
+                                add_tile<TileSand>(x+dx,m_h-(y+2*dy));
+                                // add_tile<TileSand>(x+dx,m_h-(y+dy));
                             }
                         }
                     }
@@ -80,44 +95,71 @@ int Simulator::mainloop() {
                     break;
             }
         }
-        m_window->clear();
+        if(!paused || step > 0) {
+            if(step > 0) step--;
+            m_window->clear();
 
-        if(mouse_pressed) {
-            if(last_frame_added = !last_frame_added) {
+            // if(frame_count%(2*m_w) > m_w ) {
+            //     add_tile<TileSand>( (m_w-frame_count%m_w -1 +20)%m_w, m_h-20);
+            //     add_tile<TileSand>( (m_w-frame_count%m_w -1 +20)%m_w, m_h-18);
+            //     add_tile<TileSand>( (m_w-frame_count%m_w -1 +20)%m_w, m_h-16);
+            //     add_tile<TileSand>( (m_w-frame_count%m_w -1 +20)%m_w, m_h-14);
+            //     add_tile<TileSand>( (m_w-frame_count%m_w -1 +20)%m_w, m_h-12);
+            //     add_tile<TileSand>( (m_w-frame_count%m_w -1 +20)%m_w, m_h-10);
+            // }
+            // else {
+            //     add_tile<TileSand>(frame_count%m_w, m_h-20);
+            //     add_tile<TileSand>(frame_count%m_w, m_h-18);
+            //     add_tile<TileSand>(frame_count%m_w, m_h-16);
+            //     add_tile<TileSand>(frame_count%m_w, m_h-14);
+            //     add_tile<TileSand>(frame_count%m_w, m_h-12);
+            //     add_tile<TileSand>(frame_count%m_w, m_h-10);
+            // }
+            // if(true || frame_count%2 == 0) {
+            //     add_tile<TileSand>(m_w/2, m_h-1);
+            // }
+            if(frame_count%50 == 0 ) {
+                for(int i=0;i<20; i++)
+                    for(int j=0; j<10;j++)
+                        // add_tile<TileSand>( 50+i, m_h-1-2*j);
+                        add_tile<TileSand>( 50+i, m_h-1-2*j);
+            }
 
-                int x = sf::Mouse::getPosition(*m_window).x;
-                int y = sf::Mouse::getPosition(*m_window).y;
-                if(0 < x && x < m_win_w && 0 < y && y < m_win_h) {
-                    // cout << m_nb_tiles << " : " << x << " " << y << endl;
-                    m_nb_tiles++;
-                    // if ( m_cells->at(x/m_tile_size).at(m_h - y/m_tile_size)
-                    //     == nullptr ) {
-                        // Tile * t = new TileSand(x/m_tile_size, 
-                        //                 m_h - y/m_tile_size,
-                        //                 m_w, m_h,
-                        //                 m_cells, m_cells_future);
-                        add_tile<TileSand>(x/m_tile_size, m_h - y/m_tile_size);
-                    // }
+            if(mouse_pressed) {
+                if(last_frame_added = !last_frame_added) {
+
+                    int x = sf::Mouse::getPosition(*m_window).x;
+                    int y = sf::Mouse::getPosition(*m_window).y;
+                    if(0 < x && x < m_win_w && 0 < y && y < m_win_h) {
+                        // cout << m_nb_tiles << " : " << x << " " << y << endl;
+                        m_nb_tiles++;
+                        // if ( m_cells->at(x/m_tile_size).at(m_h - y/m_tile_size)
+                        //     == nullptr ) {
+                            // Tile * t = new TileSand(x/m_tile_size, 
+                            //                 m_h - y/m_tile_size,
+                            //                 m_w, m_h,
+                            //                 m_cells, m_cells_future);
+                            add_tile<TileSand>(x/m_tile_size, m_h - y/m_tile_size);
+                        // }
+                    }
                 }
             }
-        }
 
-        update_tiles();
+            update_tiles();
 
-        m_window->display();
+            m_window->display();
+            m_window->setTitle( title );
 
-        m_window->setTitle( title );
+            sf::Time dt = clock_logique.getElapsedTime();
+            sf::sleep(requested_fps-dt);
 
-        sf::Time dt = clock_logique.getElapsedTime();
-        sf::sleep(requested_fps-dt);
+            if(frame_count%32 == 0) {
 
-        if(frame_count%32 == 0) {
-
-            dt = clock_fps.getElapsedTime();
-            snprintf(title, 128, "Falling Sand Simulator : frame %i (%.1f fps)",
-                    frame_count, 32e6/(double)dt.asMicroseconds() );
-            clock_fps.restart();
-        }
+                dt = clock_fps.getElapsedTime();
+                snprintf(title, 128, "Falling Sand Sim : frame %i (%.1f fps)",
+                        frame_count, 32e6/(double)dt.asMicroseconds() );
+                clock_fps.restart();
+            }
 
         // cout << "all tiles :" << endl;
         // Tile * t;
@@ -130,13 +172,20 @@ int Simulator::mainloop() {
         //     }
         // }
         // cout << "----" << endl;
+        // for(auto t : m_tiles) {
+        //     cout << " at " << t->get_x() << " " << t->get_y() << endl;
+        // }
+        // cout << "----" << endl;
 
         frame_count++;
+        if(frame_count == 2500) break;
         // if(frame_count%(int)(200) == 0)
         //     cout << "frame " << frame_count << " " 
         //     << m_nb_tiles << " tiles\n";
         clock_logique.restart();
         clock_boucle.restart();
+
+        }
     }
 
     delete m_window;
@@ -151,6 +200,8 @@ void Simulator::add_tile(int x, int y) {
     m_tiles.push_back(t);
     t->get_rectangle()->setSize(sf::Vector2f(m_tile_size, m_tile_size));
 }
+
+
 void Simulator::add_tile(Tile * tile) {
     m_tiles.push_back(tile);
     tile->get_rectangle()->setSize(sf::Vector2f(m_tile_size, m_tile_size));
@@ -168,7 +219,6 @@ void Simulator::remove_tile(int i) {
 
 int Simulator::update_tiles() {
     Tile * t;
-    
     // printf("%p %p\n", m_cells, m_cells_future);
     // cout << "all tiles :" << endl;
     // for(int x = 0; x < m_w; x++) {
@@ -196,14 +246,28 @@ int Simulator::update_tiles() {
         // cout << r.getFillColor().r << " " << r.getFillColor().g << " "
         //      << r.getFillColor().b << endl;
     }
+    // for(int x = 0; x < m_w; x++) {
+    //     for(int y = 0; y < m_h; y++) {
+    //         t = m_cells_future->at(x).at(y);
+    //         m_cells->at(x).at(y) = t;
+    //         if(t != nullptr)
+    //             m_window->draw( *t->get_rectangle() );
+    //     }
+    // }
 
-    for(int x = 0; x < m_w; x++) {
-        for(int y = 0; y < m_h; y++) {
-            Tile * t = m_cells_future->at(x).at(y);
+
+    int x=0; int y=0;
+    for(auto& col : *m_cells_future) {
+        for( auto& t : col) {
             m_cells->at(x).at(y) = t;
             if(t != nullptr)
                 m_window->draw( *t->get_rectangle() );
+            // m_cells_future->at(x).at(y) = nullptr;
+            // t = nullptr;
+            y++;
         }
+        x++;
+        y=0;
     }
     
 

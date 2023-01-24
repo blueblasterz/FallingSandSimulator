@@ -16,8 +16,10 @@ public:
     int mainloop();
 
     void add_tile(Tile * tile);
+
     template<class TileType>
     void add_tile(int x, int y);
+    
     void remove_tile(int i);
 
     // int update_display();
