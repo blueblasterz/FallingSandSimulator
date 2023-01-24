@@ -45,6 +45,8 @@ int Simulator::mainloop() {
     bool mouse_pressed = false;
     int frame_count=0;
 
+    const int count_update = 1;
+
     bool paused = !true;
     int step = 0;
 
@@ -93,6 +95,8 @@ int Simulator::mainloop() {
                         // mouse_pressed = false;
                     }
                     break;
+                default:
+                    break;
             }
         }
         if(!paused || step > 0) {
@@ -118,15 +122,15 @@ int Simulator::mainloop() {
             // if(true || frame_count%2 == 0) {
             //     add_tile<TileSand>(m_w/2, m_h-1);
             // }
-            if(frame_count%50 == 0 ) {
+            if(frame_count%70 == 0 ) {
                 for(int i=0;i<20; i++)
                     for(int j=0; j<10;j++)
-                        // add_tile<TileSand>( 50+i, m_h-1-2*j);
-                        add_tile<TileSand>( 50+i, m_h-1-2*j);
+                        add_tile<TileSand>( m_w/2+i-10, m_h-1-2*j);
+                        // add_tile<TileSand>( m_w/2+i-10, m_h-1-j);
             }
 
             if(mouse_pressed) {
-                if(last_frame_added = !last_frame_added) {
+                if( (last_frame_added = !last_frame_added) ) {
 
                     int x = sf::Mouse::getPosition(*m_window).x;
                     int y = sf::Mouse::getPosition(*m_window).y;
@@ -153,11 +157,12 @@ int Simulator::mainloop() {
             sf::Time dt = clock_logique.getElapsedTime();
             sf::sleep(requested_fps-dt);
 
-            if(frame_count%32 == 0) {
+            if(frame_count%count_update == 0) {
 
                 dt = clock_fps.getElapsedTime();
                 snprintf(title, 128, "Falling Sand Sim : frame %i (%.1f fps)",
-                        frame_count, 32e6/(double)dt.asMicroseconds() );
+                        frame_count,
+                        count_update*1e6/(double)dt.asMicroseconds() );
                 clock_fps.restart();
             }
 
@@ -178,7 +183,10 @@ int Simulator::mainloop() {
         // cout << "----" << endl;
 
         frame_count++;
-        if(frame_count == 2500) break;
+        if(frame_count == 275) {
+            paused = true;
+        }
+        // if(frame_count == 2500) break;
         // if(frame_count%(int)(200) == 0)
         //     cout << "frame " << frame_count << " " 
         //     << m_nb_tiles << " tiles\n";
@@ -231,7 +239,7 @@ int Simulator::update_tiles() {
     // }
     // cout << "----" << endl;
 
-    for(int i = 0; i < m_tiles.size(); i++) {
+    for(unsigned int i = 0; i < m_tiles.size(); i++) {
         t = m_tiles.at(i);
         // cout << t->get_y() << endl;
         // if(t.first->get_y() > 1) {

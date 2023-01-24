@@ -4,7 +4,7 @@ OBJDIR=./obj
 INCDIR=./include
 
 EXEC=main
-ARGS=-O3 -std=c++20
+ARGS=-O3 -std=c++20 -Wall -Wextra
 LDLIBS=-lsfml-graphics -lsfml-window -lsfml-system
 CC=g++
 

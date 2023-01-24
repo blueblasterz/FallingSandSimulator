@@ -22,6 +22,8 @@ Tile::Tile(int x, int y, int w, int h, TYPE_CELLMATRIX * cells,
     // printf("created Tile with\n%p %p\n", m_cells, m_cells_future);
 }
 
+Tile::~Tile() {}
+
 void Tile::move(int new_x, int new_y) {
     // m_cells->at(m_x).at(m_y) = nullptr; // empty current cell
 

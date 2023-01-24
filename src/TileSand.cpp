@@ -11,12 +11,14 @@ Tile(x, y, w, h, cells, cells_future) {
     m_rect->setFillColor( m_color );
 }
 
+TileSand::~TileSand() {}
+
 int TileSand::update() {
     static int count = 0;
     count++;
     // cout << "update (" << m_x << "," << m_y << ") " << count << ": ";
     if(m_y <= 1) {
-        m_cells_future->at(m_x).at(m_y) == m_cells->at(m_x).at(m_y);
+        m_cells_future->at(m_x).at(m_y) = m_cells->at(m_x).at(m_y);
         m_rect->setPosition(m_x, m_h - m_y);
         // cout << "1" << "> (" << m_x << "," << m_y << ")" << endl;
         return 0;

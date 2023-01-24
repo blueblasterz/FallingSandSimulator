@@ -8,6 +8,8 @@ Tile(x, y, w, h, cells, cells_future) {
 
 }
 
+TileEmpty::~TileEmpty() {}
+
 int TileEmpty::update() {
     return 0;
 }

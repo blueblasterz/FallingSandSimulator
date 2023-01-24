@@ -12,6 +12,8 @@ public:
     Tile(int x, int y, int w, int h, TYPE_CELLMATRIX * cells, 
          TYPE_CELLMATRIX * cells_future);;
 
+    virtual ~Tile();
+    
     void move(int new_x, int new_y);
 
     void dmove(int dx, int dy);
