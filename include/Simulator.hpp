@@ -3,48 +3,44 @@
 #include <iostream>
 #include <vector>
 // #include <format>
-#include <SFML/Graphics.hpp>
-#include "TileEmpty.hpp"
 #include "TileSand.hpp"
 
+class Matrix;
+namespace sf {
+    class RenderWindow;
+}
 
 class Simulator {
 public:
-    Simulator(int w=800, int h=600, int tile_size=1);
+    Simulator(int w=800, int h=600, int scale=1);
 
+    // starts the simulator
+    // this function does not return until the window is closed
+    void start();
 
-    int mainloop();
+    // renders a single tile, at position x,y
+    void render_tile(int x, int y, Tile * t);
 
-    void add_tile(Tile * tile);
+    // clear everything that is on screen
+    // (only visually : it does not modify m_tiles)
+    void clear();
 
-    template<class TileType>
-    void add_tile(int x, int y);
-    
-    void remove_tile(int i);
+    // draws every tiles
+    void draw_tiles();
 
-    // int update_display();
-
-    int update_tiles();
-
-    
-    TYPE_CELLMATRIX * get_cells();
-    TYPE_CELLMATRIX * get_cells_future();
 
 protected:
-    std::vector<Tile *> m_tiles;
-
-    TYPE_CELLMATRIX * m_cells;
-    TYPE_CELLMATRIX * m_cells_future;
+    Matrix * m_tiles;
     
-    int m_win_w; // width of screen in px
-    int m_win_h; // height of screen in px
 
-    int m_tile_size; // tile size in pixel
     int m_w; // width of screen in tiles
     int m_h; // height of screen in tiles
+    int m_scale; // tile size in pixel
+
+    int m_win_w;
+    int m_win_h;
 
     int m_nb_tiles; // number of tiles drawn on the screen
 
     sf::RenderWindow * m_window;
-
 };

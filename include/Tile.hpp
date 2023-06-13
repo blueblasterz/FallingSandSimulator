@@ -9,8 +9,7 @@ std::vector<std::vector<Tile *>>
 
 class Tile {
 public:
-    Tile(int x, int y, int w, int h, TYPE_CELLMATRIX * cells, 
-         TYPE_CELLMATRIX * cells_future);;
+    Tile(int x, int y, int scale);
 
     virtual ~Tile();
     
@@ -28,21 +27,17 @@ public:
     // void set_rectangle(sf::RectangleShape * rect);
     sf::RectangleShape * get_rectangle();
 
-    void draw(sf::RenderWindow * win);
-
-
-    
-    
-
 protected:
+
+    void update_rectangle(
+        bool update_pos = true,
+        bool update_color = false,
+        bool update_scale = false);
+
     int m_x;
     int m_y;
 
-    int m_w;
-    int m_h;
-
-    TYPE_CELLMATRIX * m_cells;
-    TYPE_CELLMATRIX * m_cells_future;
+    int m_scale;
 
     sf::Color m_color;
     sf::RectangleShape * m_rect;

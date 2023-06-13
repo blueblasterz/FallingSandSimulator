@@ -1,31 +1,26 @@
 #include "Tile.hpp"
 #include <iostream>
 
+#include "Matrix.hpp"
+
 using std::cout, std::endl;
 
-Tile::Tile(int x, int y, int w, int h, TYPE_CELLMATRIX * cells, 
-           TYPE_CELLMATRIX * cells_future)
-: m_x(x), m_y(y), m_w(w), m_h(h), m_cells(cells),
-  m_cells_future(cells_future) {
-
-    if(m_cells->at(m_x).at(m_y) != nullptr) {
-        delete m_cells->at(m_x).at(m_y);
-    }
-    m_cells->at(m_x).at(m_y) = this;
+Tile::Tile(int x, int y, int scale)
+: m_x(x), m_y(y), m_scale(scale) {
 
     m_color = sf::Color::White;
 
     m_rect = new sf::RectangleShape();
-    m_rect->setFillColor( m_color );
-    m_rect->setPosition(m_x, m_y);
+
+    this->update_rectangle(true,true,true);
     
-    // printf("created Tile with\n%p %p\n", m_cells, m_cells_future);
+    // printf("created Tile at %i,%i scale %i\n", m_x, m_y, m_scale);
+    // cout << m_rect->getPosition().x << endl;
 }
 
 Tile::~Tile() {}
 
 void Tile::move(int new_x, int new_y) {
-    // m_cells->at(m_x).at(m_y) = nullptr; // empty current cell
 
     m_x = new_x;
     m_y = new_y;
@@ -60,6 +55,18 @@ sf::RectangleShape * Tile::get_rectangle() {
     return m_rect;
 }
 
-void Tile::draw(sf::RenderWindow * win) {
-    win->draw(*m_rect);
+void Tile::update_rectangle(
+    bool update_pos,
+    bool update_color,
+    bool update_scale
+    ) {
+    if(update_pos) {
+        m_rect->setPosition( m_x*m_scale, m_y*m_scale );
+    }
+    if(update_color) {
+        m_rect->setFillColor(m_color);
+    }
+    if(update_scale) {
+        m_rect->setSize(sf::Vector2f(m_scale, m_scale));
+    }
 }
