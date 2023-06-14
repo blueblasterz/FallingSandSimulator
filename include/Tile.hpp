@@ -4,12 +4,11 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 
-#define TYPE_CELLMATRIX \
-std::vector<std::vector<Tile *>>
+class Matrix;
 
 class Tile {
 public:
-    Tile(int x, int y, int scale);
+    Tile(int x, int y, int scale, int height);
 
     virtual ~Tile();
     
@@ -22,7 +21,7 @@ public:
     int get_x();
     sf::Color get_color();
 
-    virtual int update() = 0;
+    virtual int update(Matrix * matrix) = 0;
 
     // void set_rectangle(sf::RectangleShape * rect);
     sf::RectangleShape * get_rectangle();
@@ -38,6 +37,8 @@ protected:
     int m_y;
 
     int m_scale;
+
+    int m_height;
 
     sf::Color m_color;
     sf::RectangleShape * m_rect;

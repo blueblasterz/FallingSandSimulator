@@ -28,6 +28,9 @@ public:
     // draws every tiles
     void draw_tiles();
 
+    // iterates through all the tiles
+    void iteration();
+
 
 protected:
     Matrix * m_tiles;

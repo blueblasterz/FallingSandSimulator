@@ -4,8 +4,8 @@ OBJDIR=./obj
 INCDIR=./include
 
 EXEC=main
-ARGS=-O3 -std=c++20 -Wall -Wextra
-LDLIBS=-lsfml-graphics -lsfml-window -lsfml-system
+ARGS=-O0 -ggdb3 -std=c++20 -Wall -Wextra
+LDLIBS=-lsfml-graphics -lsfml-window -lsfml-system -lboost_stacktrace_backtrace -ldl
 CC=g++
 
 # ----------------------------------------------

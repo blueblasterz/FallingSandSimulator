@@ -7,10 +7,10 @@
 class TileSand : public Tile {
 public:
 
-    TileSand(int x, int y, int scale );
+    TileSand(int x, int y, int scale, int height );
 
     ~TileSand();
     
-    int update();
+    int update(Matrix * matrix);
 
 };
