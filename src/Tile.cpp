@@ -6,7 +6,8 @@
 using std::cout, std::endl;
 
 Tile::Tile(int x, int y, int scale, int height)
-: m_x(x), m_y(y), m_scale(scale), m_height(height) {
+: m_x(x), m_y(y), m_scale(scale), m_height(height),m_landed(true),
+m_future_landed_state(0) {
 
     m_color = sf::Color::White;
 
@@ -55,6 +56,22 @@ sf::Color Tile::get_color() {
 
 sf::RectangleShape * Tile::get_rectangle() {
     return m_rect;
+}
+
+
+bool Tile::is_landed() {
+    return m_landed;
+}
+void Tile::set_landed_state(bool state) {
+    m_landed = state;
+}
+
+
+int Tile::get_future_landed_state() {
+    return m_future_landed_state;
+}
+void Tile::set_future_landed_state(int state) {
+    m_future_landed_state = state;
 }
 
 void Tile::update_rectangle(

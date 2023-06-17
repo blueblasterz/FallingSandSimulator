@@ -3,9 +3,9 @@
 #include <iostream>
 #include <vector>
 // #include <format>
-#include "TileSand.hpp"
+// #include <typeindex> // for the vector of TileTypes
+#include "Matrix.hpp"
 
-class Matrix;
 namespace sf {
     class RenderWindow;
 }
@@ -17,6 +17,12 @@ public:
     // starts the simulator
     // this function does not return until the window is closed
     void start();
+
+    /*
+    adds a tile at x,y
+    the tiletype depends on the current value of m_selected_tiletype
+    */
+    void add_tile(int x, int y);
 
     // renders a single tile, at position x,y
     void render_tile(int x, int y, Tile * t);
@@ -30,6 +36,7 @@ public:
 
     // iterates through all the tiles
     void iteration();
+    
 
 
 protected:
@@ -46,4 +53,10 @@ protected:
     int m_nb_tiles; // number of tiles drawn on the screen
 
     sf::RenderWindow * m_window;
+
+
+    int m_selected_tiletype;
+    const int m_n_tile_types;
+    
+
 };

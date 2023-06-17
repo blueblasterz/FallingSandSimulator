@@ -1,7 +1,5 @@
 #pragma once
 
-#include <vector>
-#include <iostream>
 #include "Tile.hpp"
 
 class TileSand : public Tile {

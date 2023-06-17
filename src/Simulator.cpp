@@ -1,7 +1,6 @@
 #include "Simulator.hpp"
 
 #include "utils.hpp"
-#include "Matrix.hpp"
 
 #include <ranges>
 
@@ -33,7 +32,7 @@ std::ostream& operator<<(std::ostream& os, const sf::RectangleShape& obj) {
 
 
 Simulator::Simulator(int w, int h, int scale): 
-m_w(w), m_h(h), m_scale(scale) {
+m_w(w), m_h(h), m_scale(scale), m_n_tile_types(2) {
     m_win_w = m_w * m_scale;
     m_win_h = m_h * m_scale;
 
@@ -44,7 +43,10 @@ m_w(w), m_h(h), m_scale(scale) {
     m_nb_tiles = 0;
     m_window = nullptr;
 
-    m_tiles = new Matrix(m_w,m_h);
+    m_tiles = new Matrix(m_w,m_h, m_scale);
+
+
+    m_selected_tiletype = 0;
 
 }
 
@@ -68,6 +70,7 @@ void Simulator::start() {
     int iter= 0;
 
     bool mouse_pressed_left = false;
+    bool mouse_pressed_right = false;
 
     // number of frame during which mouse_pressed_left is ignored
     int ignore_mouse_pressed = 0;
@@ -112,36 +115,55 @@ void Simulator::start() {
                         // cout << "pressed b" << endl;
                         creating_square = 2;
                     }
+                    else if(event.key.code == sf::Keyboard::Tab) {
+                        m_selected_tiletype = (m_selected_tiletype+1)%m_n_tile_types;
+                    }
+                    else if(event.key.code == sf::Keyboard::BackSpace) {
+                        m_tiles->delete_all();
+                    }
                     break;
                 case sf::Event::MouseButtonPressed:
                     if(event.mouseButton.button == sf::Mouse::Left) {
                         mouse_pressed_left = true;
-                        if(creating_square != 0) {
-                            creating_square--;
-                            if (creating_square == 1) {
-                                // cout << "first step creating square" << endl;
-                                prev_x = get_mouse_x(m_window);
-                                prev_y = get_mouse_y(m_window);
-                            }
-                            else {
-                                // cout << "2nd step creating square" << endl;
-                                curr_x = get_mouse_x(m_window);
-                                curr_y = get_mouse_y(m_window);
-                                for (int x = min(prev_x,curr_x); x < max(prev_x,curr_x); x++) {
-                                    for (int y = min(prev_y,curr_y); y < max(prev_y,curr_y); y++) {
-                                        m_tiles->set_tile(x,y,
-                                            new TileSand(x,y,m_scale,m_h)
-                                        );
+                    }
+                    else if(event.mouseButton.button == sf::Mouse::Right) {
+                        mouse_pressed_right = true;
+                    }
+                    if(creating_square != 0) {
+                        creating_square--;
+                        if (creating_square == 1) {
+                            // cout << "first step creating square" << endl;
+                            prev_x = get_mouse_x(m_window);
+                            prev_y = get_mouse_y(m_window);
+                        }
+                        else {
+                            // cout << "2nd step creating square" << endl;
+                            curr_x = get_mouse_x(m_window);
+                            curr_y = get_mouse_y(m_window);
+                            for (int x = min(prev_x,curr_x); x < max(prev_x,curr_x); x++) {
+                                for (int y = min(prev_y,curr_y); y < max(prev_y,curr_y); y++) {
+                                    // m_tiles->set_tile(x,y,
+                                    //     new TileSand(x,y,m_scale,m_h)
+                                    // );
+                                    // m_tiles->set_tile<TileSand>(x,y);
+                                    if(mouse_pressed_left) {
+                                        this->add_tile(x,y);
+                                    }
+                                    else {
+                                        m_tiles->delete_tile(x,y);
                                     }
                                 }
-                                ignore_mouse_pressed = 10;
                             }
-                        }   
-                    }
+                            ignore_mouse_pressed = 10;
+                        }
+                    }   
                     break;
                 case sf::Event::MouseButtonReleased:
                     if(event.mouseButton.button == sf::Mouse::Left) {
                         mouse_pressed_left = false;
+                    }
+                    else if(event.mouseButton.button == sf::Mouse::Right) {
+                        mouse_pressed_right = false;
                     }
                     curr_x = -1;
                     curr_y = -1;
@@ -168,13 +190,22 @@ void Simulator::start() {
                 for (auto pos : list_pts) {
                     
                     if( m_tiles->get_tile(pos.first,pos.second) == nullptr ) {
-                        m_tiles->set_tile(
-                            pos.first,
-                            pos.second,
-                            new TileSand(pos.first,pos.second,m_scale,m_h));
+                        // m_tiles->set_tile(
+                        //     pos.first,
+                        //     pos.second,
+                        //     new TileSand(pos.first,pos.second,m_scale,m_h));
+                        // m_tiles->set_tile<TileSand>(
+                        //     pos.first,
+                        //     pos.second);
+                        this->add_tile(pos.first, pos.second);
                     }
                 }
             }
+        }
+        if(mouse_pressed_right) {
+            curr_x = get_mouse_x(m_window);
+            curr_y = get_mouse_y(m_window);
+            m_tiles->delete_tile(curr_x,curr_y);
         }
         if(paused) {
             if (step != 0) {
@@ -191,12 +222,40 @@ void Simulator::start() {
 
         iter++;
         if(iter%framerate == 0) {
-            cout << "iter : " << iter << endl;
+            int n_tiles = 0;
+            for(auto line : m_tiles->get_matrix()) {
+                for(auto tile : line) {
+                    if (tile != nullptr) {
+                        n_tiles++;
+                    }
+                }
+            }
+            // cout << "iter : " << iter << " nb_tiles : " << n_tiles << endl;
         }
     }
 }
 
+
+
+void Simulator::add_tile(int x, int y) {
+    switch(m_selected_tiletype) {
+        case 0:
+            m_tiles->set_tile<TileSand>(x,y);
+            break;
+        case 1:
+            m_tiles->set_tile<TileRock>(x,y);
+            break;
+        default:
+            cerr << "invalid value for m_selected_tiletype : "
+            << m_selected_tiletype  << endl;
+            // m_selected_tiletype = 0;
+    }
+}
+
 void Simulator::render_tile(int x, int y, Tile * t) {
+    (void)x;
+    (void)y;
+    (void)t;
     cerr << "not implemented : Simulator::render_tile" << endl;
 }
 

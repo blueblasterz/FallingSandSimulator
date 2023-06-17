@@ -32,9 +32,10 @@ std::ostream& operator<<(std::ostream& os, const Matrix& obj) {
 }
 
 
-Matrix::Matrix(int w, int h) :
+Matrix::Matrix(int w, int h, int scale) :
     m_w(w),
-    m_h(h)
+    m_h(h),
+    m_scale(scale)
 {
     m_matrix.resize(m_h);
     for(int i = 0; i < m_h; i++) {
@@ -58,10 +59,12 @@ void Matrix::set_tile(int x, int y, Tile * tile) {
     m_matrix.at(y).at(x) = tile;
 }
 
+
+
 Tile * Matrix::get_tile(int x, int y) {
     if( x < 0 || x >= m_w || y < 0 || y >= m_h ) {
-        std::cerr << "invalid get_tile : at " << x << "," << y << std::endl;
-        std::cerr << boost::stacktrace::stacktrace();
+        // std::cerr << "invalid get_tile : at " << x << "," << y << std::endl;
+        // std::cerr << boost::stacktrace::stacktrace();
         return nullptr;
     }
     return m_matrix.at(y).at(x);
@@ -71,6 +74,14 @@ void Matrix::delete_tile(int x, int y) {
     if(INBOUNDS(x,0,m_w) && INBOUNDS(y,0,m_h)) {
         delete this->get_tile(x,y);
         this->set_tile(x,y,nullptr);
+    }
+}
+
+void Matrix::delete_all() {
+    for(int x=0; x < m_w; x++) {
+        for(int y=0; y < m_h; y++) {
+            this->delete_tile(x,y);
+        }
     }
 }
 
@@ -90,6 +101,13 @@ void Matrix::move_tile(int x, int y, int x_dest,int y_dest) {
     this->set_tile(x_dest,y_dest, t);
     this->set_tile(x,y,nullptr);
 }
+
+void Matrix::set_tile_landed_state(int x, int y, int state) {
+    if( this->get_tile(x,y) != nullptr ) {
+        m_matrix.at(y).at(x)->set_future_landed_state(state);
+    }
+}
+
 
 bool Matrix::inbounds(int x, int y) {
     return 0 <= x && x < m_w && 0 <= y && y < m_h;
